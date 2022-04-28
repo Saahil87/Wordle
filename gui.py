@@ -47,7 +47,7 @@ LIGHT_GREY = (129, 131, 132)
 GREEN = (83, 141, 78)
 YELLOW = (181, 159, 59)
 
-INPUT = "SPEED"
+INPUT = ""
 GUESSES = []
 COLORS = []
 KEYBOARD = ["QWERTYUIOP", "ASDFGHJKL", "ZXCVBNM"]
@@ -167,6 +167,3 @@ while animating:
             elif len(INPUT) < 5 and not GAME_OVER:
                 INPUT = INPUT + event.unicode.upper()
                 # print(INPUT)
-
-    if GAME_OVER:
-        print(GAME_OVER)
