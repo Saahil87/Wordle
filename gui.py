@@ -47,11 +47,10 @@ LIGHT_GREY = (129, 131, 132)
 GREEN = (83, 141, 78)
 YELLOW = (181, 159, 59)
 
-INPUT = ""
+INPUT = "SPEED"
 GUESSES = []
 COLORS = []
 KEYBOARD = ["QWERTYUIOP", "ASDFGHJKL", "ZXCVBNM"]
-UNGUESSED = "".join(KEYBOARD)
 ALPHABET_DICT = {}
 
 GAME_OVER = False
@@ -63,16 +62,6 @@ pygame.display.set_caption("Wordle")
 SQ_SIZE = (WIDTH-4*MARGIN-2*LR_MARGIN) // 5
 FONT = pygame.font.SysFont("free sans bold", SQ_SIZE)
 FONT_SMALL = pygame.font.SysFont("free sans bold", SQ_SIZE//2)
-
-
-def determine_unguessed_letters(guesses):
-    guessed_letters = "".join(guesses)
-    unguessed_letters = ""
-    for l in "".join(KEYBOARD):
-        if l not in guessed_letters:
-            unguessed_letters = unguessed_letters+l
-    return unguessed_letters
-
 
 # create screen
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -114,7 +103,7 @@ while animating:
     # show the correct ANSWER after a game over
     if len(GUESSES) == 6 and GUESSES[5] != ANSWER:
         GAME_OVER = True
-        letters = FONT_SMALL.render(ANSWER.upper(), False, WHITE)
+        letters = pygame.font.SysFont("cambria", SQ_SIZE//3, bold=True).render(ANSWER.upper(), False, WHITE)
         surface = letters.get_rect(center=(WIDTH//2, y + SQ_SIZE//6))
         screen.blit(letters, surface)
 
@@ -156,12 +145,11 @@ while animating:
                 if len(INPUT) == 5 and INPUT.lower() in words:
                     GUESSES.append(INPUT)
                     COLORS.append(validate(INPUT.lower()))
-                    for guess, color in zip(GUESSES, COLORS):
-                        for letter, rgb in zip(guess, color):
+                    for g, c in zip(GUESSES, COLORS):
+                        for letter, rgb in zip(g, c):
                             if letter not in ALPHABET_DICT.keys():
                                 ALPHABET_DICT[letter] = rgb
 
-                    UNGUESSED = determine_unguessed_letters(GUESSES)
                     GAME_OVER = True if INPUT == ANSWER.upper() else False
                     INPUT = ""
 
@@ -173,10 +161,12 @@ while animating:
                 GUESSES = []
                 COLORS = []
                 ALPHABET_DICT = {}
-                UNGUESSED = "".join(KEYBOARD)
                 INPUT = ""
 
             # regular text input
             elif len(INPUT) < 5 and not GAME_OVER:
                 INPUT = INPUT + event.unicode.upper()
                 # print(INPUT)
+
+    if GAME_OVER:
+        print(GAME_OVER)
