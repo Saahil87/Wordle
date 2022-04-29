@@ -76,7 +76,7 @@ In essence, we hope to create a metric that helps us capture how much uncertaint
 
 A seemingly, intimidating equation, but when broken down this is a very easy metric to compute and intuitivly understand. 
 
-The theoretical upper bound for the expected information obtainable from a guessing a particular word, or simply as we've dubbed as "xG" is the sums of the probability of encountering a particular response (a 5 lettered permutation of grey, yellow, and green tiles) times the the negative log of this probability.
+The expected information obtainable from a guessing a particular word, or simply as we've dubbed as "xG" is the sums of the probability of encountering a particular response (a 5 lettered permutation of grey, yellow, and green tiles) times the the negative log of this probability.
 
 
 So what does this metric tell us about starting words?
