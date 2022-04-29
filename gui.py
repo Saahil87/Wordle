@@ -32,7 +32,7 @@ with open('data/words.txt') as f:
         possible_answers.append(line.strip())
 
 ANSWER = random.choice(possible_answers)
-# ANSWER = "nerve"
+ANSWER = "final"
 print(ANSWER)
 
 
