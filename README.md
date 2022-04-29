@@ -109,11 +109,11 @@ Throughout our project we extensively made use of Pandas Dataframes. They were e
 
 ## Complexity 
 
-Validating a word choice: O(n)
-Filtering by a letter (green): O(n)
-Filtering by a letter (grey): O(m * n) m-> length of word; n -> size of dictionary; Can be approximated to O(n), since m is constant, i.e., O(5)
-Filtering by a letter (yellow): O(m * n) m-> length of word; n -> size of dictionary; Can be approximated to O(n), since m is constant, i.e., O(5)
-Calculating xG: O(n * n * n) + O(n) ~ O(n * n * n) or O(n^3); This can be brought down to O(n^2) through Dynamic Programming.
+Validating a word choice: O(n) <br/>
+Filtering by a letter (green): O(n) <br/>
+Filtering by a letter (grey): O(m * n) m-> length of word; n -> size of dictionary; Can be approximated to O(n), since m is constant, i.e., O(5) <br/>
+Filtering by a letter (yellow): O(m * n) m-> length of word; n -> size of dictionary; Can be approximated to O(n), since m is constant, i.e., O(5) <br/>
+Calculating xG: O(n * n * n) + O(n) ~ O(n * n * n) or O(n^3); This can be brought down to O(n^2) through Dynamic Programming. <br/>
 
 ## Future Work
 
