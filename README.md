@@ -52,5 +52,5 @@ An improvement to build on our previous iteration involved solving the game more
 Below we see a histogram depicting the performance of a simulation of this approach for all games:
 
 <p align="center">
-<img src = "./resources/info_constrained_filtering_histogram.jpg">
+<img src = "./resources/info_constrained_filtering_histogram.jpg" width="600">
 </p>
