@@ -107,7 +107,7 @@ We see that this approach has improved things significantly. Not only are we abl
 Throughout our project we extensively made use of Pandas Dataframes. They were especially useful with storing words (as individual letters), filtering out unlikely words, calculating probabilites, xGs, etc.
 
 
-## Complexity 
+## Complexity Analysis
 
 Validating a word choice: O(n) <br/>
 Filtering by a letter (green): O(n) <br/>
