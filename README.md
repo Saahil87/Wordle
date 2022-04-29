@@ -3,7 +3,7 @@
 ## Background
 
 <p align="center">
-<img src = "./resources/ss.png" width="300">
+<img src = "./resources/ss.png" width="600">
 </p>
 
 
@@ -86,5 +86,34 @@ So what does this metric tell us about starting words?
 Below is a sample of some of the good and bad choices to start the game off with.
 
 <p align="center">
-<img src = "./resources/words.png" width="600">
+<img src = "./resources/words.png" width="300">
 </p>
+
+How does it perform?
+
+Below we see a histogram depicting the performance of a simulation after appending the above formulation for all games:
+
+<p align="center">
+<img src = "./resources/info_theory_histogram.jpg" width="600">
+</p>
+
+We see that this approach has improved things significantly. Not only are we able to win 99.58% of the games (nearly 2% improvement), but also a signficant drop in the average guesses needed to 3.62 guesses. This is better than the average human from the best performing country at Wordle, and second best (to Canberra) when compared to the city averages.
+
+## Choice of Data Structures
+
+Throughout our project we extensively made use of Pandas Dataframes. They were especially useful with storing words (as individual letters), filtering out unlikely words, calculating probabilites, xGs, etc.
+
+## Future Work
+
+<ol>
+  
+  <li> Two Level xG - our approach calculates the xG metric for a single word to optimise for the best choice. Integrating a two level xG, where we also optimise our choice of first word to also consider the options for the second choice of word could potentially improve things </li>
+  <li> Calculating xG with more finesse - every time we make a guess and our pool of words reduce, we recalculate the xG for each word all over again. This is time consuming and a very poor algorithmic choice given that the xG values for the updated dictionary can be potentially be recalculated without having to recalculate from scratch all over again </li>
+  
+</ol>
+
+## Acknowledgements
+
+A lot of our ideas were inspired by the YouTuber 3Blue1Brown who covered the topic of Wordle and Information Theory in their <a href="https://www.youtube.com/watch?v=v68zYyaEmEA&ab_channel=3Blue1Brown"> channel </a>.
+
+ <h1 align="center"> END </h1>
