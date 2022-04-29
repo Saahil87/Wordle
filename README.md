@@ -18,10 +18,19 @@ Wordle has gained much popularity since the start of 2022. According to an <a hr
 
 ## Solving Wordle
 
-With the growing popularity, the conversation of solving Wordle is a highly by individuals from various circles. A topic of much debate within the community is the choice of starting word. Below is a map depicting the average attempts it takes for a player to solve Wordle by country.
+With the growing popularity, the conversation of solving Wordle is a highly by individuals from various circles. A topic of much debate within the community is the choice of starting word. 
+
+
+Below is a visualisation map depicting the average attempts it takes for a player to solve Wordle by country:
 
 
 <p align="center">
-<img src = "https://images.prismic.io/wordtips/1533ed82-0c9c-4953-a025-2aed8cc6e050_01-Wordle-Wizards_World-Map_Hi-RES.png?auto=compress,format&rect=0,0,2400,2127&w=800&h=709" width="300">
+<img src = "https://images.prismic.io/wordtips/1533ed82-0c9c-4953-a025-2aed8cc6e050_01-Wordle-Wizards_World-Map_Hi-RES.png?auto=compress,format&rect=0,0,2400,2127&w=800&h=709" width="600">
 </p>
 
+
+Below is a visualisation depicting the average attempts it takes for a player to solve Wordle on a city level:
+
+<p align="center">
+<img src = "https://images.prismic.io/wordtips/0464f2e0-f69f-458b-9a8f-80140f6da459_02_Wordle-Wizards_Top-10-Global-Cities.png?auto=compress,format&rect=0,0,1201,1904&w=800&h=1268">
+</p>
