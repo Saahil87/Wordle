@@ -5,8 +5,21 @@ import random
 from collections import Counter
 import pygame
 
+# AI Imports
+import pandas as pd
+from services2 import validate2
+import numpy as np
+import threading
+
+import time
+
+
 # AI True/False
 AI = True
+
+# FORCE FIRST WORD
+FORCE = True
+
 
 words = []
 with open('data/allowed_words.txt') as f:
@@ -19,7 +32,30 @@ with open('data/words.txt') as f:
         possible_answers.append(line.strip())
 
 ANSWER = random.choice(possible_answers)
+# ANSWER = "nerve"
 print(ANSWER)
+
+
+def prepareWordDF():
+    with open("./data/words.txt") as f:
+        words = f.readlines()
+        
+    cols = []
+    for col in np.arange(5):
+        cols.append(f"c{col}")
+    df = pd.DataFrame(columns = cols)
+    for idx, word in enumerate(words):
+        print(f"{idx+1}/{len(words)}", end="\r")
+        df = pd.concat([df, pd.DataFrame([list(word.strip())], columns=cols)], ignore_index = True, axis = 0)
+    
+    return df
+
+wordDF = prepareWordDF()
+searchSpace = wordDF.copy()
+
+xGBoard = pd.read_csv("xGTable.csv")
+
+AI_GUESS = ""
 
 WIDTH = 600
 HEIGHT = 800
@@ -79,6 +115,94 @@ def color2trinary(colors):
 
     return "".join(str(e) for e in trinary_colors)
 
+
+def filteredSearch(df, constraints, guess):
+    
+    cols = []
+    for col in np.arange(5):
+        cols.append(f"c{col}")
+    filtered = df
+    searchList = {}
+    for idx, constrain in enumerate(list(constraints)):
+        
+        if(constrain=="2"):
+            filtered = filtered[filtered.eq(guess[idx]).any(1)]
+            filtered = filtered[filtered[f"c{idx}"]!=guess[idx]]
+        if(constrain=="1"):
+            filtered = filtered[filtered[f"c{idx}"]==guess[idx]]
+        if(constrain=="0"):
+            if(guess[idx] not in searchList):
+                filtered = filtered[filtered.eq(guess[idx]).any(1) == False]
+            else:
+                filtered = filtered[filtered[f"c{idx}"]!=guess[idx]]
+        searchList[guess[idx]] = guess[idx]
+    return filtered.reset_index()[cols]
+
+
+def xMap(guess, df):
+    fbMap = {}
+    for _, row in df.iterrows():
+        word = "".join(row)
+        _, fb = validate2(word, guess)
+        if(fb in fbMap):
+            fbMap[fb] +=1
+        else:
+            fbMap[fb] = 1
+    return fbMap
+
+def getxG(guess, df):
+    fbMap = xMap(guess, df)
+    x = 0
+    for info in fbMap:
+        p = fbMap[info]/df.shape[0]
+        x += p* - np.log2(p)
+    return x
+
+
+def getBestWords(df):
+    xGBoard = pd.DataFrame(columns=["word", "xG"])
+    
+    for idx, row in df.iterrows():
+#         clear_output(wait = True)
+#         print(f"{idx+1}/{df.shape[0]}")
+        word = "".join(row)
+        xG = getxG(word, df)
+        xGBoard = xGBoard.append({"word": word, "xG": xG}, ignore_index = True)
+    return xGBoard
+
+
+def infoTheorySolver(df, word):
+    xGBoard = pd.read_csv("xGTable.csv")
+    guesses = 0
+    isDone = False
+    while(isDone == False):
+        guess = xGBoard.sort_values(by="xG", ascending=False).iloc[0]["word"]
+        isDone, fb = validate(word, guess)
+        df = filteredSearch(df, fb, guess)
+        xGBoard = getBestWords(df)
+        guesses +=1
+    return guesses
+
+
+def getGuess(idx):
+    global searchSpace
+    global xGBoard
+    global AI_GUESS
+    print(idx)
+    if(idx == 0):
+        AI_GUESS = xGBoard.sort_values(by="xG", ascending=False).iloc[0]["word"]
+    else:
+        print(searchSpace.shape)
+        print(TRINARY_COLORS[-1])
+        print(GUESSES[-1])
+        print(GUESSES)
+        print(TRINARY_COLORS)
+        searchSpace = filteredSearch(searchSpace, str(TRINARY_COLORS[-1]), GUESSES[-1].lower())
+        # print(searchSpace.shape)
+        xGBoard = getBestWords(searchSpace)
+        
+        AI_GUESS = xGBoard.sort_values(by="xG", ascending=False).iloc[0]["word"]
+        
 
 # create screen
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -147,8 +271,18 @@ while animating:
             animating = False
         elif event.type == pygame.KEYDOWN:
             if AI and not GAME_OVER:
+                
+                # Integrate AI HERE
                 INPUT = random.choice(words).upper()
-                # print(color2trinary(validate(INPUT.lower())))
+                print("Shape in here")
+                print(searchSpace.shape)
+                print("Done")
+                x = threading.Thread(target=getGuess, args=(len(GUESSES),))
+                x.start()
+                pygame.display.flip()
+                x.join()
+                INPUT = AI_GUESS.upper()
+#                 print(color2trinary(validate(INPUT.lower())))
 
             # escape key to quit animation
             if event.type == pygame.K_ESCAPE:
@@ -169,7 +303,8 @@ while animating:
                         for letter, rgb in zip(g, c):
                             if letter not in ALPHABET_DICT.keys():
                                 ALPHABET_DICT[letter] = rgb
-
+                    
+                    # 
                     GAME_OVER = True if INPUT == ANSWER.upper() else False
                     INPUT = ""
 
@@ -183,6 +318,9 @@ while animating:
                 TRINARY_COLORS = []
                 ALPHABET_DICT = {}
                 INPUT = ""
+                searchSpace = wordDF.copy()
+                if(not FORCE):
+                    AI_GUESS = "RAISE"
 
             # regular text input
             elif len(INPUT) < 5 and not GAME_OVER:

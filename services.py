@@ -36,6 +36,28 @@ def validate(answer, guess):
         flag = True
     return flag, "".join(colors)
 
+
+def filteredSearch(df, constraints, guess):
+    cols = []
+    for col in np.arange(5):
+        cols.append(f"c{col}")
+    filtered = df
+    searchList = {}
+    for idx, constrain in enumerate(list(constraints)):
+        
+        if(constrain=="2"):
+            filtered[filtered.eq(guess[idx]).any(1)]
+            filtered = filtered[filtered[f"c{idx}"]!=guess[idx]]
+        if(constrain=="1"):
+            filtered = filtered[filtered[f"c{idx}"]==guess[idx]]
+        if(constrain=="0"):
+            if(guess[idx] not in searchList):
+                filtered = filtered[filtered.eq(guess[idx]).any(1) == False]
+        searchList[guess[idx]] = guess[idx]
+    return filtered.reset_index()[cols]
+
+
+
 def prepareWordDF():
     with open("./data/words.txt") as f:
         words = f.readlines()
