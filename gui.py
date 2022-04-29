@@ -18,7 +18,7 @@ import time
 AI = True
 
 # FORCE FIRST WORD
-FORCE = True
+FORCE = False
 
 
 words = []
@@ -32,8 +32,8 @@ with open('data/words.txt') as f:
         possible_answers.append(line.strip())
 
 ANSWER = random.choice(possible_answers)
-ANSWER = "final"
-print(ANSWER)
+# ANSWER = "final"
+# print(ANSWER)
 
 
 def prepareWordDF():
@@ -190,7 +190,10 @@ def getGuess(idx):
     global AI_GUESS
     print(idx)
     if(idx == 0):
-        AI_GUESS = xGBoard.sort_values(by="xG", ascending=False).iloc[0]["word"]
+        if(FORCE==False):
+            AI_GUESS = "raise"
+        else:
+            AI_GUESS = xGBoard.sort_values(by="xG", ascending=False).iloc[0]["word"]
     else:
         print(searchSpace.shape)
         print(TRINARY_COLORS[-1])
@@ -319,8 +322,8 @@ while animating:
                 ALPHABET_DICT = {}
                 INPUT = ""
                 searchSpace = wordDF.copy()
-                if(not FORCE):
-                    AI_GUESS = "RAISE"
+                # if(FORCE==False):
+                
 
             # regular text input
             elif len(INPUT) < 5 and not GAME_OVER:
