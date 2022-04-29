@@ -111,8 +111,8 @@ Throughout our project we extensively made use of Pandas Dataframes. They were e
 
 Validating a word choice: O(n) <br/>
 Filtering by a letter (green): O(n) <br/>
-Filtering by a letter (grey): O(m * n) m-> length of word; n -> size of dictionary; Can be approximated to O(n), since m is constant, i.e., O(5) <br/>
-Filtering by a letter (yellow): O(m * n) m-> length of word; n -> size of dictionary; Can be approximated to O(n), since m is constant, i.e., O(5) <br/>
+Filtering by a letter (grey): O(m * n) m-> length of word; n -> size of dictionary; Can be approximated to O(n), since m = 5 is constant, i.e., O(1) <br/>
+Filtering by a letter (yellow): O(m * n) m-> length of word; n -> size of dictionary; Can be approximated to O(n), since m = 5 is constant, i.e., O(1) <br/>
 Calculating xG: O(n * n * n) + O(n) ~ O(n * n * n) or O(n^3); This can be brought down to O(n^2) through Dynamic Programming. <br/>
 
 ## Future Work
@@ -122,7 +122,7 @@ Calculating xG: O(n * n * n) + O(n) ~ O(n * n * n) or O(n^3); This can be brough
   <li> Two Level xG - our approach calculates the xG metric for a single word to optimise for the best choice. Integrating a two level xG, where we also optimise our choice of first word to also consider the options for the second choice of word could potentially improve things </li>
   <li> Calculating xG with more finesse - every time we make a guess and our pool of words reduce, we recalculate the xG for each word all over again. This is time consuming and a very poor algorithmic choice given that the xG values for the updated dictionary can be potentially be recalculated without having to recalculate from scratch all over again. </li>
   <li> N-Wordle - Extend Wordle to play for words beyond the length of 5 letters. </li>
-  <li> 
+  <li> Quordle - A 4x variant of Wordle which poses additional challenges.
   
 </ol>
 
