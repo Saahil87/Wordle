@@ -5,6 +5,9 @@ import random
 from collections import Counter
 import pygame
 
+# AI True/False
+AI = True
+
 words = []
 with open('data/allowed_words.txt') as f:
     for line in f:
@@ -17,22 +20,6 @@ with open('data/words.txt') as f:
 
 ANSWER = random.choice(possible_answers)
 print(ANSWER)
-
-
-def validate(guess):
-    colors = [GREY, GREY, GREY, GREY, GREY]
-    character_matches = dict(Counter(list(ANSWER)) & Counter(list(guess)))
-    for i in range(5):
-        if ANSWER[i] == guess[i]:
-            colors[i] = GREEN
-            character_matches[guess[i]] -= 1
-
-        if guess[i] in character_matches.keys() and colors[i] == GREY:
-            if character_matches[guess[i]] > 0:
-                colors[i] = YELLOW
-                character_matches[guess[i]] -= 1
-    return colors
-
 
 WIDTH = 600
 HEIGHT = 800
@@ -50,6 +37,7 @@ YELLOW = (181, 159, 59)
 INPUT = ""
 GUESSES = []
 COLORS = []
+TRINARY_COLORS = []
 KEYBOARD = ["QWERTYUIOP", "ASDFGHJKL", "ZXCVBNM"]
 ALPHABET_DICT = {}
 
@@ -63,13 +51,42 @@ SQ_SIZE = (WIDTH-4*MARGIN-2*LR_MARGIN) // 5
 FONT = pygame.font.SysFont("free sans bold", SQ_SIZE)
 FONT_SMALL = pygame.font.SysFont("free sans bold", SQ_SIZE//2)
 
+
+def validate(guess):
+    colors = [GREY, GREY, GREY, GREY, GREY]
+    character_matches = dict(Counter(list(ANSWER)) & Counter(list(guess)))
+    for i in range(5):
+        if ANSWER[i] == guess[i]:
+            colors[i] = GREEN
+            character_matches[guess[i]] -= 1
+
+        if guess[i] in character_matches.keys() and colors[i] == GREY:
+            if character_matches[guess[i]] > 0:
+                colors[i] = YELLOW
+                character_matches[guess[i]] -= 1
+    return colors
+
+
+def color2trinary(colors):
+    trinary_colors = [0, 0, 0, 0, 0]
+    for i in range(len(colors)):
+        if colors[i] == GREY:
+            trinary_colors[i] = 0
+        elif colors[i] == GREEN:
+            trinary_colors[i] = 1
+        elif colors[i] == YELLOW:
+            trinary_colors[i] = 2
+
+    return "".join(str(e) for e in trinary_colors)
+
+
 # create screen
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 
 # animation loop
 animating = True
-while animating:
 
+while animating:
     # background
     screen.fill("black")
     letters = pygame.font.SysFont("cambria", SQ_SIZE//2, bold=True).render("Wordle", False, WHITE)
@@ -124,13 +141,15 @@ while animating:
     # update the screen
     pygame.display.flip()
 
-    # track user interaction
     for event in pygame.event.get():
-
         # closing the window stops the animation
         if event.type == pygame.QUIT:
             animating = False
         elif event.type == pygame.KEYDOWN:
+            if AI and not GAME_OVER:
+                INPUT = random.choice(words).upper()
+                # print(color2trinary(validate(INPUT.lower())))
+
             # escape key to quit animation
             if event.type == pygame.K_ESCAPE:
                 animating = False
@@ -145,6 +164,7 @@ while animating:
                 if len(INPUT) == 5 and INPUT.lower() in words:
                     GUESSES.append(INPUT)
                     COLORS.append(validate(INPUT.lower()))
+                    TRINARY_COLORS.append(color2trinary(validate(INPUT.lower())))
                     for g, c in zip(GUESSES, COLORS):
                         for letter, rgb in zip(g, c):
                             if letter not in ALPHABET_DICT.keys():
@@ -160,10 +180,12 @@ while animating:
                 print(ANSWER)
                 GUESSES = []
                 COLORS = []
+                TRINARY_COLORS = []
                 ALPHABET_DICT = {}
                 INPUT = ""
 
             # regular text input
             elif len(INPUT) < 5 and not GAME_OVER:
                 INPUT = INPUT + event.unicode.upper()
-                # print(INPUT)
+
+
