@@ -69,3 +69,20 @@ We will be making using of a modified version of the Expectation Equation, as se
 
 In essence, we hope to create a metric that helps us capture how much uncertainty would entering in a particular word reduce, on average, to help us reduce our search space. Higher the number better. 
 
+
+<p align="center">
+<img src = "./resources/xG.png" width="600">
+</p>
+
+A seemingly, intimidating equation, but when broken down this is a very easy metric to compute and intuitivly understand. 
+
+The theoretical upper bound for the expected information obtainable from a guessing a particular word, or simply as we've dubbed as "xG" is the sums of the probability of encountering a particular response (a 5 lettered permutation of grey, yellow, and green tiles) times the the negative log of this probability.
+
+
+So what does this metric tell us about starting words?
+
+"Raise" is the best word to start the game with. This seems like fairly intuitive for good and bad choices given that raise has 3 vowels, and the letters "r" and "s" both which are fairly frequent. The worst word to start the game off on the other hand is with "fuzzy". Two occurances of the letter "z" - seems fairly obvious again.
+
+Below is a sample of some of the good and bad choices to start the game off with.
+
+
