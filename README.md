@@ -3,7 +3,7 @@
 ## Background
 
 <p align="center">
-<img src = "./resources/ss.png">
+<img src = "./resources/ss.png" width="80">
 </p>
 
 
