@@ -1,5 +1,8 @@
 <h1 align="center">IS 597 - Data Structures and Algorithms: Final Project - Wordle </h1>
 
+## Authors: Prithvi Prakash, Saahil Hiranandani
+
+
 ## Background
 
 <p align="center">
