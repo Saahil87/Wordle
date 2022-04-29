@@ -4,22 +4,16 @@ Source: https://www.youtube.com/watch?v=TsnovVfkafI
 import random
 from collections import Counter
 import pygame
-
-# AI Imports
 import pandas as pd
 from services2 import validate2
 import numpy as np
 import threading
 
-import time
-
-
 # AI True/False
 AI = True
 
 # FORCE FIRST WORD
-FORCE = False
-
+FORCE = True
 
 words = []
 with open('data/allowed_words.txt') as f:
@@ -36,10 +30,12 @@ ANSWER = random.choice(possible_answers)
 # print(ANSWER)
 
 
-def prepareWordDF():
-    with open("./data/words.txt") as f:
-        words = f.readlines()
-        
+def prepareWordDF(words):
+    """
+
+    :param words:
+    :return:
+    """
     cols = []
     for col in np.arange(5):
         cols.append(f"c{col}")
@@ -47,10 +43,10 @@ def prepareWordDF():
     for idx, word in enumerate(words):
         print(f"{idx+1}/{len(words)}", end="\r")
         df = pd.concat([df, pd.DataFrame([list(word.strip())], columns=cols)], ignore_index = True, axis = 0)
-    
     return df
 
-wordDF = prepareWordDF()
+
+wordDF = prepareWordDF(possible_answers)
 searchSpace = wordDF.copy()
 
 xGBoard = pd.read_csv("xGTable.csv")
@@ -83,12 +79,17 @@ pygame.init()
 pygame.font.init()
 pygame.display.set_caption("Wordle")
 
-SQ_SIZE = (WIDTH-4*MARGIN-2*LR_MARGIN) // 5
+SQ_SIZE = (WIDTH - 4 * MARGIN - 2 * LR_MARGIN) // 5
 FONT = pygame.font.SysFont("free sans bold", SQ_SIZE)
-FONT_SMALL = pygame.font.SysFont("free sans bold", SQ_SIZE//2)
+FONT_SMALL = pygame.font.SysFont("free sans bold", SQ_SIZE // 2)
 
 
 def validate(guess):
+    """
+    Validates the current word with colors
+    :param guess: The current guess
+    :return: list of colors for each character
+    """
     colors = [GREY, GREY, GREY, GREY, GREY]
     character_matches = dict(Counter(list(ANSWER)) & Counter(list(guess)))
     for i in range(5):
@@ -104,6 +105,11 @@ def validate(guess):
 
 
 def color2trinary(colors):
+    """
+    Converts color list to trinary string
+    :param colors: Color list
+    :return: Trinary string
+    """
     trinary_colors = [0, 0, 0, 0, 0]
     for i in range(len(colors)):
         if colors[i] == GREY:
@@ -117,54 +123,76 @@ def color2trinary(colors):
 
 
 def filteredSearch(df, constraints, guess):
-    
+    """
+
+    :param df:
+    :param constraints:
+    :param guess:
+    :return:
+    """
     cols = []
     for col in np.arange(5):
         cols.append(f"c{col}")
     filtered = df
     searchList = {}
     for idx, constrain in enumerate(list(constraints)):
-        
-        if(constrain=="2"):
+
+        if constrain == "2":
             filtered = filtered[filtered.eq(guess[idx]).any(1)]
-            filtered = filtered[filtered[f"c{idx}"]!=guess[idx]]
-        if(constrain=="1"):
-            filtered = filtered[filtered[f"c{idx}"]==guess[idx]]
-        if(constrain=="0"):
-            if(guess[idx] not in searchList):
+            filtered = filtered[filtered[f"c{idx}"] != guess[idx]]
+        if constrain == "1":
+            filtered = filtered[filtered[f"c{idx}"] == guess[idx]]
+        if constrain == "0":
+            if guess[idx] not in searchList:
                 filtered = filtered[filtered.eq(guess[idx]).any(1) == False]
             else:
-                filtered = filtered[filtered[f"c{idx}"]!=guess[idx]]
+                filtered = filtered[filtered[f"c{idx}"] != guess[idx]]
         searchList[guess[idx]] = guess[idx]
     return filtered.reset_index()[cols]
 
 
 def xMap(guess, df):
+    """
+
+    :param guess:
+    :param df:
+    :return:
+    """
     fbMap = {}
     for _, row in df.iterrows():
         word = "".join(row)
         _, fb = validate2(word, guess)
-        if(fb in fbMap):
-            fbMap[fb] +=1
+        if fb in fbMap:
+            fbMap[fb] += 1
         else:
             fbMap[fb] = 1
     return fbMap
 
+
 def getxG(guess, df):
+    """
+
+    :param guess:
+    :param df:
+    :return:
+    """
     fbMap = xMap(guess, df)
     x = 0
     for info in fbMap:
-        p = fbMap[info]/df.shape[0]
-        x += p* - np.log2(p)
+        p = fbMap[info] / df.shape[0]
+        x += p * - np.log2(p)
     return x
 
 
 def getBestWords(df):
+    """
+
+    :param df:
+    :return:
+    """
     xGBoard = pd.DataFrame(columns=["word", "xG"])
-    
+
     for idx, row in df.iterrows():
-#         clear_output(wait = True)
-#         print(f"{idx+1}/{df.shape[0]}")
         word = "".join(row)
         xG = getxG(word, df)
         xGBoard = xGBoard.append({"word": word, "xG": xG}, ignore_index = True)
@@ -172,28 +200,38 @@ def getBestWords(df):
 
 
 def infoTheorySolver(df, word):
+    """
+
+    :param df:
+    :param word:
+    :return:
+    """
     xGBoard = pd.read_csv("xGTable.csv")
     guesses = 0
     isDone = False
-    while(isDone == False):
+    while not isDone:
         guess = xGBoard.sort_values(by="xG", ascending=False).iloc[0]["word"]
         isDone, fb = validate(word, guess)
         df = filteredSearch(df, fb, guess)
         xGBoard = getBestWords(df)
-        guesses +=1
+        guesses += 1
     return guesses
 
 
 def getGuess(idx):
+    """
+
+    :param idx:
+    """
     global searchSpace
     global xGBoard
     global AI_GUESS
     print(idx)
-    if(idx == 0):
-        if(FORCE==False):
-            AI_GUESS = "raise"
-        else:
+    if idx == 0:
+        if FORCE:
             AI_GUESS = xGBoard.sort_values(by="xG", ascending=False).iloc[0]["word"]
+        else:
+            AI_GUESS = "raise"
     else:
         print(searchSpace.shape)
         print(TRINARY_COLORS[-1])
@@ -203,9 +241,9 @@ def getGuess(idx):
         searchSpace = filteredSearch(searchSpace, str(TRINARY_COLORS[-1]), GUESSES[-1].lower())
         # print(searchSpace.shape)
         xGBoard = getBestWords(searchSpace)
-        
+
         AI_GUESS = xGBoard.sort_values(by="xG", ascending=False).iloc[0]["word"]
-        
+
 
 # create screen
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -216,7 +254,7 @@ animating = True
 while animating:
     # background
     screen.fill("black")
-    letters = pygame.font.SysFont("cambria", SQ_SIZE//2, bold=True).render("Wordle", False, WHITE)
+    letters = pygame.font.SysFont("cambria", SQ_SIZE // 2, bold=True).render("Wordle", False, WHITE)
     surface = letters.get_rect(center=(WIDTH // 2, 25))
     screen.blit(letters, surface)
     pygame.draw.line(screen, LIGHT_GREY, (0, 50), (WIDTH, 50))
@@ -232,13 +270,13 @@ while animating:
                 color = COLORS[i][j]
                 pygame.draw.rect(screen, color, square, border_radius=3)
                 letter = FONT.render(GUESSES[i][j], False, (255, 255, 255))
-                surface = letter.get_rect(center = (x+SQ_SIZE//2, y+SQ_SIZE//2))
+                surface = letter.get_rect(center=(x + SQ_SIZE // 2, y + SQ_SIZE // 2))
                 screen.blit(letter, surface)
 
             # user text input next guess
             if i == len(GUESSES) and j < len(INPUT):
                 letter = FONT.render(INPUT[j], False, WHITE)
-                surface = letter.get_rect(center = (x+SQ_SIZE//2, y+SQ_SIZE//2))
+                surface = letter.get_rect(center=(x + SQ_SIZE // 2, y + SQ_SIZE // 2))
                 screen.blit(letter, surface)
 
             x += SQ_SIZE + MARGIN
@@ -247,8 +285,8 @@ while animating:
     # show the correct ANSWER after a game over
     if len(GUESSES) == 6 and GUESSES[5] != ANSWER:
         GAME_OVER = True
-        letters = pygame.font.SysFont("cambria", SQ_SIZE//3, bold=True).render(ANSWER.upper(), False, WHITE)
-        surface = letters.get_rect(center=(WIDTH//2, y + SQ_SIZE//6))
+        letters = pygame.font.SysFont("cambria", SQ_SIZE // 3, bold=True).render(ANSWER.upper(), False, WHITE)
+        surface = letters.get_rect(center=(WIDTH // 2, y + SQ_SIZE // 6))
         screen.blit(letters, surface)
 
     y = y + SQ_SIZE // 2
@@ -260,7 +298,7 @@ while animating:
                 color = ALPHABET_DICT[char]
             pygame.draw.rect(screen, color, pygame.Rect(x, y, 45, 55), border_radius=3)
             letter = FONT_SMALL.render(char, False, (255, 255, 255))
-            surface = letter.get_rect(center=(x + 45/2, y + 55/2))
+            surface = letter.get_rect(center=(x + 45 / 2, y + 55 / 2))
             screen.blit(letter, surface)
             x += 50
         y += 60
@@ -274,7 +312,6 @@ while animating:
             animating = False
         elif event.type == pygame.KEYDOWN:
             if AI and not GAME_OVER:
-                
                 # Integrate AI HERE
                 INPUT = random.choice(words).upper()
                 print("Shape in here")
@@ -285,7 +322,6 @@ while animating:
                 pygame.display.flip()
                 x.join()
                 INPUT = AI_GUESS.upper()
-#                 print(color2trinary(validate(INPUT.lower())))
 
             # escape key to quit animation
             if event.type == pygame.K_ESCAPE:
@@ -294,7 +330,7 @@ while animating:
             # backspace to correct user input
             if event.key == pygame.K_BACKSPACE:
                 if len(INPUT) > 0:
-                    INPUT = INPUT[:len(INPUT)-1]
+                    INPUT = INPUT[:len(INPUT) - 1]
 
             # return key to submit a guess
             elif event.key == pygame.K_RETURN:
@@ -306,7 +342,7 @@ while animating:
                         for letter, rgb in zip(g, c):
                             if letter not in ALPHABET_DICT.keys():
                                 ALPHABET_DICT[letter] = rgb
-                    
+
                     # 
                     GAME_OVER = True if INPUT == ANSWER.upper() else False
                     INPUT = ""
@@ -322,11 +358,7 @@ while animating:
                 ALPHABET_DICT = {}
                 INPUT = ""
                 searchSpace = wordDF.copy()
-                # if(FORCE==False):
-                
 
             # regular text input
             elif len(INPUT) < 5 and not GAME_OVER:
                 INPUT = INPUT + event.unicode.upper()
-
-
