@@ -85,4 +85,6 @@ So what does this metric tell us about starting words?
 
 Below is a sample of some of the good and bad choices to start the game off with.
 
-
+<p align="center">
+<img src = "./resources/words.png" width="600">
+</p>
