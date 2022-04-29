@@ -54,3 +54,18 @@ Below we see a histogram depicting the performance of a simulation of this appro
 <p align="center">
 <img src = "./resources/info_constrained_filtering_histogram.jpg" width="600">
 </p>
+
+We see that a simple change results in a solver capable of winning ~97.8% of the games! Can we do better than randomly selecting a word from a filtered pool?
+
+### Iteration 2: Constrained Filtering with Information Theory
+
+The biggest hinderance with the previous iteration's solver comes from making guesses "randomly" from the pool of choices. In order to improve on this we need to quantify the value of each word. In order to do so, we leverage <a href ="https://en.wikipedia.org/wiki/Information_theory"> Information Theory </a>. This is a well studied field that comes at the intersection of probability, statistics, computer science among other fields. The central theme of Information Theory is to capture "entropy" which can be thought of as a measure of uncertainty associated with a Random Variable. Our goal is to perform something similar where we aim to reduce the uncertainty within our pool of possible words, which are each equally likely, down to the one correct word to win the game.
+
+We will be making using of a modified version of the Expectation Equation, as seen below to capture this uncertainty metric.
+
+<p align="center">
+<img src = "https://miro.medium.com/max/996/1*o_tK3Q4J33WLWiUlpVBYbg.png" width="600">
+</p>
+
+In essence, we hope to create a metric that helps us capture how much uncertainty would entering in a particular word reduce, on average, to help us reduce our search space. Higher the number better. 
+
