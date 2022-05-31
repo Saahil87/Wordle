@@ -26,15 +26,14 @@ with open('data/words.txt') as f:
         possible_answers.append(line.strip())
 
 ANSWER = random.choice(possible_answers)
-# ANSWER = "final"
 # print(ANSWER)
 
 
 def prepareWordDF(words):
     """
-
-    :param words:
-    :return:
+    Converts words to a pandas dataframe containing 5 columns for each letter.
+    :param words: list of words
+    :return: Word DataFrame
     """
     cols = []
     for col in np.arange(5):
@@ -124,11 +123,11 @@ def color2trinary(colors):
 
 def filteredSearch(df, constraints, guess):
     """
-
-    :param df:
-    :param constraints:
-    :param guess:
-    :return:
+    Filters the search space based on previous feedback
+    :param df: Word DataFrame
+    :param constraints: Previous Feedback
+    :param guess: Current guess
+    :return: Filtered search space
     """
     cols = []
     for col in np.arange(5):
@@ -153,10 +152,10 @@ def filteredSearch(df, constraints, guess):
 
 def xMap(guess, df):
     """
-
-    :param guess:
-    :param df:
-    :return:
+    Creates a map of most frequent letters used in 5 letter words
+    :param guess: Current guess
+    :param df: Word DF
+    :return: Frequency Map
     """
     fbMap = {}
     for _, row in df.iterrows():
@@ -171,10 +170,11 @@ def xMap(guess, df):
 
 def getxG(guess, df):
     """
-
-    :param guess:
-    :param df:
-    :return:
+    Implementing the expectation equation
+    :param guess: Current guess
+    :param df: Word DF
+    :return: Expected Information - (sums of the probability of encountering a particular response
+     times the the negative log of this probability)
     """
     fbMap = xMap(guess, df)
     x = 0
@@ -186,9 +186,9 @@ def getxG(guess, df):
 
 def getBestWords(df):
     """
-
-    :param df:
-    :return:
+    Getting best guess from expected Information
+    :param df: Word DF
+    :return: List of words sorted by expectation
     """
     xGBoard = pd.DataFrame(columns=["word", "xG"])
 
@@ -201,10 +201,10 @@ def getBestWords(df):
 
 def infoTheorySolver(df, word):
     """
-
-    :param df:
-    :param word:
-    :return:
+    Helper function to call all functions.
+    :param df: Word DF
+    :param word: First word
+    :return: List of possible guesses
     """
     xGBoard = pd.read_csv("xGTable.csv")
     guesses = 0
@@ -220,8 +220,8 @@ def infoTheorySolver(df, word):
 
 def getGuess(idx):
     """
-
-    :param idx:
+    Returns guess from list of guesses and resets everything after a guess
+    :param idx: Index of current guess out of 6
     """
     global searchSpace
     global xGBoard
